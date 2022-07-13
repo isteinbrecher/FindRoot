@@ -1,9 +1,6 @@
-
 #pragma once
 
-#include <array>
 #include "math_utils.H"
-#include <iostream>
 
 namespace FindRoot
 {
@@ -49,7 +46,7 @@ namespace FindRoot
       }
 
       // Solve the linear system
-      if (Math::SolveLinearSystem<T, n_dim>(jac, r, delta_x))
+      if (Math::LinearSolve<n_dim>::SolveLinearSystem(jac, r, delta_x))
       {
         // Update the state vector and advance Newton iteration counter.
         for (unsigned short i = 0; i < n_dim; i++) x[i] -= delta_x[i];
