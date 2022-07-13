@@ -15,26 +15,22 @@ struct meins
   }
 };
 
-template <>
-struct newton::function<meins>
+
+int main(int, char*[])
 {
-  static inline bool check_convergence() { return true; }
-};
-
-
-
-int main(int argc, char* argv[])
-{
-  newton::newton_data params;
-  params.local_newton_iter_max = 2;
+  FindRoot::IterationParameters params;
+  params.max_iterations = 10;
 
 
   std::array<double, 1> x;
   x[0] = 2;
-  newton::newton<meins>(params, x.data());
+  FindRoot::IterationData data = FindRoot::NewtonRaphson<meins>(params, x.data());
 
 
   std::cout << "\nx: " << x[0] << "\n";
+  std::cout << "\nError: " << data.error << "\n";
+  std::cout << "\nNumber of iterations: " << data.iterations << "\n";
+  std::cout << "\nConverged: " << data.converged << "\n";
 
   return 0;
 }

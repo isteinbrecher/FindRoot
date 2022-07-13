@@ -5,72 +5,65 @@
 #include "math_utils.H"
 #include <iostream>
 
-namespace newton
+namespace FindRoot
 {
-  struct newton_data
+
+  struct IterationParameters
   {
-    unsigned int local_newton_iter_max = 20;
+    unsigned int max_iterations = 20;
+    double tol_f = 1e-12;
+    double tol_x = 1e-12;
   };
 
-
-
-  template <typename T>
-  struct function
+  struct IterationData
   {
-    static inline bool check_convergence(newton_data& params) { return false; }
+    bool error = false;
+    bool converged = false;
+    unsigned int iterations = 0;
   };
-
-
-  template <typename T>
-  inline bool check_convergence(newton_data& params)
-  {
-    return true;
-  };
-
-
 
   template <typename fun, typename T, typename... Args>
-  inline void newton(newton_data& params, T* x, Args... args)
+  inline IterationData NewtonRaphson(IterationParameters& params, T* x, Args... args)
   {
+    // Shortcut for system size
     constexpr unsigned short n_dim = fun::n_dim;
 
     // Initialize variables for the Newton iteration
+    IterationData return_data;
     T r[n_dim];
     T delta_x[n_dim];
     T jac[n_dim * n_dim];
 
-    // Local Newton iteration.
+    // Local Newton iteration
+    unsigned int counter = 0;
+    while (counter < params.max_iterations)
     {
-      check_convergence<fun>(params);
-      std::cout << "\nconvergence: " << function<fun>::check_convergence();
+      // Evaluate the function and the Jacobian
+      fun::eval_f_jac(x, r, jac, args...);
 
-
-      unsigned int counter = 0;
-      while (counter < params.local_newton_iter_max)
+      // Check for convergence
+      if (Math::Norm2<T, n_dim>(r) < params.tol_f && Math::Norm2<T, n_dim>(delta_x) < params.tol_x)
       {
-        fun::eval_f_jac(x, r, jac);
+        return_data.converged = true;
+        break;
+      }
 
-        std::cout << "\n res: " << newton::math::norm2<T, n_dim>(r);
-        if (newton::math::norm2<T, n_dim>(r) < 1e-12)
-        {
-          std::cout << "\n counter: " << counter;
-          break;
-        }
-
-        // Solve the linearized system.
-        if (newton::math::SolveLinearSystem<T, n_dim>(jac, r, delta_x))
-        {
-          // Set the new parameter coordinates.
-          for (unsigned short i = 0; i < n_dim; i++) x[i] -= delta_x[i];
-
-          // Advance Newton iteration counter.
-          counter++;
-        }
-        else
-          break;
+      // Solve the linear system
+      if (Math::SolveLinearSystem<T, n_dim>(jac, r, delta_x))
+      {
+        // Update the state vector and advance Newton iteration counter.
+        for (unsigned short i = 0; i < n_dim; i++) x[i] -= delta_x[i];
+        counter++;
+      }
+      else
+      {
+        return_data.error = true;
+        break;
       }
     }
+
+    return_data.iterations = counter;
+    return return_data;
   };
 
-
-}  // namespace newton
+}  // namespace FindRoot
