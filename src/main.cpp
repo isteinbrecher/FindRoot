@@ -15,9 +15,11 @@ struct meins
   }
 };
 
-
-// template <>
-// struct newton::function<Mesh, ArborX::PrimitivesTag>
+template <>
+struct newton::function<meins>
+{
+  static inline bool check_convergence() { return false; }
+};
 
 
 
@@ -25,7 +27,7 @@ int main(int argc, char* argv[])
 {
   std::array<double, 1> x;
   x[0] = 2;
-  newton::newton<meins>(x.data());
+  newton::newton<meins, 1>(x.data());
 
 
   std::cout << "\nx: " << x[0] << "\n";
