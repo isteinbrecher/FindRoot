@@ -25,8 +25,10 @@ namespace newton
       {
         fun::eval_f_jac(x, r, jac);
 
+        std::cout << "\n res: " << newton::math::norm2<T, n_dim>(r);
         if (newton::math::norm2<T, n_dim>(r) < 1e-12)
         {
+          std::cout << "\n counter: " << counter;
           break;
         }
 
