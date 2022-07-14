@@ -9,13 +9,37 @@ namespace FindRoot
   namespace Math
   {
     template <unsigned short n_dim, typename T>
-    inline T mat(const T* A, const unsigned short i_row, const unsigned short i_col)
+    inline T& mat(T* A, const unsigned short i_row, const unsigned short i_col)
     {
       // Default is Fortran type access
       return A[i_row + n_dim * i_col];
     }
 
-    template <typename T, unsigned short n_dim>
+    template <unsigned short n_dim, typename T>
+    inline void ScaleLinearSystem(T* A, T* b)
+    {
+      // Scale each row so that the largest entry is one
+      T max_value;
+      for (unsigned short i_row = 0; i_row < n_dim; i_row++)
+      {
+        max_value = 0.0;
+        for (unsigned short i_col = 0; i_col < n_dim; i_col++)
+        {
+          if (std::abs(mat<n_dim>(A, i_row, i_col)) > max_value)
+          {
+            max_value = mat<n_dim>(A, i_row, i_col);
+          }
+        }
+        max_value = 1.0 / max_value;
+        for (unsigned short i_col = 0; i_col < n_dim; i_col++)
+        {
+          mat<n_dim>(A, i_row, i_col) *= max_value;
+        }
+        b[i_row] *= max_value;
+      }
+    }
+
+    template <unsigned short n_dim, typename T>
     inline T Norm2(const T* r)
     {
       T norm = 0.0;
@@ -32,7 +56,7 @@ namespace FindRoot
     struct LinearSolve<1>
     {
       template <typename T>
-      static inline bool SolveLinearSystem(const T* A, const T* b, T* x)
+      static inline bool SolveLinearSystem(T* A, T* b, T* x)
       {
         if (std::abs(A[0]) < 1e-12)
           return false;
@@ -47,6 +71,8 @@ namespace FindRoot
     template <>
     struct LinearSolve<2>
     {
+      static constexpr unsigned int n_dim = 3;
+
       template <typename T>
       static inline T Determinant(const T* A)
       {
@@ -54,8 +80,10 @@ namespace FindRoot
       }
 
       template <typename T>
-      static inline bool SolveLinearSystem(const T* A, const T* b, T* x)
+      static inline bool SolveLinearSystem(T* A, T* b, T* x)
       {
+        ScaleLinearSystem<n_dim>(A, b);
+
         T det = Determinant(A);
         if (std::abs(det) < 1e-12)
           return false;
@@ -86,8 +114,10 @@ namespace FindRoot
       }
 
       template <typename T>
-      static inline bool SolveLinearSystem(const T* A, const T* b, T* x)
+      static inline bool SolveLinearSystem(T* A, T* b, T* x)
       {
+        ScaleLinearSystem<n_dim>(A, b);
+
         T det = Determinant(A);
         if (std::abs(det) < 1e-12)
           return false;

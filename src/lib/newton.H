@@ -39,7 +39,7 @@ namespace FindRoot
       fun::eval_f_jac(x, r, jac, args...);
 
       // Check for convergence
-      if (Math::Norm2<T, n_dim>(r) < params.tol_f && Math::Norm2<T, n_dim>(delta_x) < params.tol_x)
+      if (Math::Norm2<n_dim>(r) < params.tol_f && Math::Norm2<n_dim>(delta_x) < params.tol_x)
       {
         return_data.converged = true;
         break;
