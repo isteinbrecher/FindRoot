@@ -71,7 +71,7 @@ namespace FindRoot
     template <>
     struct LinearSolve<2>
     {
-      static constexpr unsigned int n_dim = 3;
+      static constexpr unsigned int n_dim = 2;
 
       template <typename T>
       static inline T Determinant(const T* A)
