@@ -84,7 +84,7 @@ namespace FindRoot
       {
         ScaleLinearSystem<n_dim>(A, b);
 
-        T det = Determinant(A);
+        const T det = Determinant(A);
         if (std::abs(det) < 1e-12)
           return false;
         else
@@ -118,7 +118,7 @@ namespace FindRoot
       {
         ScaleLinearSystem<n_dim>(A, b);
 
-        T det = Determinant(A);
+        const T det = Determinant(A);
         if (std::abs(det) < 1e-12)
           return false;
         else
