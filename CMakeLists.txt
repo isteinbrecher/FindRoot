@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.16)
 
-project (newton)
+project (find_root)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -19,7 +19,7 @@ set(SOURCES
   )
 
 add_compile_options(-Wall)
-add_executable(nr ${SOURCES})
+add_executable(find_root ${SOURCES})
 
 
 # Include googletest
@@ -34,7 +34,7 @@ FetchContent_MakeAvailable(googletest)
 # Set the executable
 enable_testing()
 
-set(name_exe nr-tests-release)
+set(name_exe find_root-tests)
 add_executable(${name_exe} tests/tests.cpp)
 target_link_libraries(${name_exe}
   gtest_main

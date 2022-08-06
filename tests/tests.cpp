@@ -2,7 +2,7 @@
  * \brief Test the local Netwon-Raphson algorithm..
  */
 
-#include "../src/lib/newton.H"
+#include "../src/lib/find_root.H"
 #include <gtest/gtest.h>
 
 
