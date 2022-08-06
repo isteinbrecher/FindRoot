@@ -37,8 +37,8 @@ TEST(nr_tests, test_2x2)
   x[1] = 1.0;
   FindRoot::IterationData data = FindRoot::NewtonRaphson<Function2x2>(params, x.data());
 
-  EXPECT_NEAR(x[0], -0.25224642002463515, tol);
-  EXPECT_NEAR(x[1], -2.0632453402062128, tol);
+  EXPECT_NEAR(x[0], -0.25609874104976987, tol);
+  EXPECT_NEAR(x[1], -2.0655865651672771, tol);
 }
 
 

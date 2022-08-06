@@ -55,14 +55,16 @@ namespace FindRoot
     template <>
     struct LinearSolve<1>
     {
+      static constexpr unsigned int n_dim = 1;
+
       template <typename T>
       static inline bool SolveLinearSystem(T* A, T* b, T* x)
       {
-        if (std::abs(A[0]) < 1e-12)
+        if (std::abs(mat<n_dim>(A, 0, 0)) < 1e-12)
           return false;
         else
         {
-          x[0] = b[0] / A[0];
+          x[0] = b[0] / mat<n_dim>(A, 0, 0);
           return true;
         }
       }
@@ -76,7 +78,8 @@ namespace FindRoot
       template <typename T>
       static inline T Determinant(const T* A)
       {
-        return A[0] * A[3] - A[1] * A[2];
+        return mat<n_dim>(A, 0, 0) * mat<n_dim>(A, 1, 1) -
+               mat<n_dim>(A, 0, 1) * mat<n_dim>(A, 1, 0);
       }
 
       template <typename T>
@@ -90,8 +93,8 @@ namespace FindRoot
         else
         {
           const T det_inv = 1.0 / det;
-          x[0] = (A[4] * b[0] - A[2] * b[1]) * det_inv;
-          x[1] = (-A[1] * b[0] + A[0] * b[1]) * det_inv;
+          x[0] = (mat<n_dim>(A, 1, 1) * b[0] - mat<n_dim>(A, 0, 1) * b[1]) * det_inv;
+          x[1] = (-mat<n_dim>(A, 1, 0) * b[0] + mat<n_dim>(A, 0, 0) * b[1]) * det_inv;
           return true;
         }
       }
