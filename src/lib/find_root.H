@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.H"
 #include "math_utils.H"
 
 namespace FindRoot
