@@ -16,6 +16,12 @@ namespace FindRoot
     }
 
     template <unsigned short n_dim, typename T>
+    inline T& vec(T* v, const unsigned short i_row)
+    {
+      return v[i_row];
+    }
+
+    template <unsigned short n_dim, typename T>
     inline T GetLinearSystemScaleFactor(const T* A)
     {
       // Scale each row so that the largest entry is one
@@ -60,7 +66,7 @@ namespace FindRoot
           return false;
         else
         {
-          x[0] = b[0] / mat<n_dim>(A, 0, 0);
+          vec<n_dim>(x, 0) = vec<n_dim>(b, 0) / mat<n_dim>(A, 0, 0);
           return true;
         }
       }
@@ -88,8 +94,12 @@ namespace FindRoot
         else
         {
           const T det_inv = 1.0 / det;
-          x[0] = (mat<n_dim>(A, 1, 1) * b[0] - mat<n_dim>(A, 0, 1) * b[1]) * det_inv;
-          x[1] = (-mat<n_dim>(A, 1, 0) * b[0] + mat<n_dim>(A, 0, 0) * b[1]) * det_inv;
+          vec<n_dim>(x, 0) =
+              (mat<n_dim>(A, 1, 1) * vec<n_dim>(b, 0) - mat<n_dim>(A, 0, 1) * vec<n_dim>(b, 1)) *
+              det_inv;
+          vec<n_dim>(x, 1) =
+              (-mat<n_dim>(A, 1, 0) * vec<n_dim>(b, 0) + mat<n_dim>(A, 0, 0) * vec<n_dim>(b, 1)) *
+              det_inv;
           return true;
         }
       }
@@ -121,21 +131,27 @@ namespace FindRoot
         else
         {
           const T det_inv = 1.0 / det;
-          x[0] = (mat<n_dim>(A, 0, 2) * mat<n_dim>(A, 2, 1) -
-                     mat<n_dim>(A, 0, 1) * mat<n_dim>(A, 2, 2)) *
-                     b[1] +
-                 mat<n_dim>(A, 1, 2) * (-mat<n_dim>(A, 2, 1) * b[0] + mat<n_dim>(A, 0, 1) * b[2]) +
-                 mat<n_dim>(A, 1, 1) * (mat<n_dim>(A, 2, 2) * b[0] - mat<n_dim>(A, 0, 2) * b[2]);
-          x[1] = (-mat<n_dim>(A, 0, 2) * mat<n_dim>(A, 2, 0) +
-                     mat<n_dim>(A, 0, 0) * mat<n_dim>(A, 2, 2)) *
-                     b[1] +
-                 mat<n_dim>(A, 1, 2) * (mat<n_dim>(A, 2, 0) * b[0] - mat<n_dim>(A, 0, 0) * b[2]) +
-                 mat<n_dim>(A, 1, 0) * (-mat<n_dim>(A, 2, 2) * b[0] + mat<n_dim>(A, 0, 2) * b[2]);
-          x[2] = (mat<n_dim>(A, 0, 1) * mat<n_dim>(A, 2, 0) -
-                     mat<n_dim>(A, 0, 0) * mat<n_dim>(A, 2, 1)) *
-                     b[1] +
-                 mat<n_dim>(A, 1, 1) * (-mat<n_dim>(A, 2, 0) * b[0] + mat<n_dim>(A, 0, 0) * b[2]) +
-                 mat<n_dim>(A, 1, 0) * (mat<n_dim>(A, 2, 1) * b[0] - mat<n_dim>(A, 0, 1) * b[2]);
+          vec<n_dim>(x, 0) = (mat<n_dim>(A, 0, 2) * mat<n_dim>(A, 2, 1) -
+                                 mat<n_dim>(A, 0, 1) * mat<n_dim>(A, 2, 2)) *
+                                 vec<n_dim>(b, 1) +
+                             mat<n_dim>(A, 1, 2) * (-mat<n_dim>(A, 2, 1) * vec<n_dim>(b, 0) +
+                                                       mat<n_dim>(A, 0, 1) * vec<n_dim>(b, 2)) +
+                             mat<n_dim>(A, 1, 1) * (mat<n_dim>(A, 2, 2) * vec<n_dim>(b, 0) -
+                                                       mat<n_dim>(A, 0, 2) * vec<n_dim>(b, 2));
+          vec<n_dim>(x, 1) = (-mat<n_dim>(A, 0, 2) * mat<n_dim>(A, 2, 0) +
+                                 mat<n_dim>(A, 0, 0) * mat<n_dim>(A, 2, 2)) *
+                                 vec<n_dim>(b, 1) +
+                             mat<n_dim>(A, 1, 2) * (mat<n_dim>(A, 2, 0) * vec<n_dim>(b, 0) -
+                                                       mat<n_dim>(A, 0, 0) * vec<n_dim>(b, 2)) +
+                             mat<n_dim>(A, 1, 0) * (-mat<n_dim>(A, 2, 2) * vec<n_dim>(b, 0) +
+                                                       mat<n_dim>(A, 0, 2) * vec<n_dim>(b, 2));
+          vec<n_dim>(x, 2) = (mat<n_dim>(A, 0, 1) * mat<n_dim>(A, 2, 0) -
+                                 mat<n_dim>(A, 0, 0) * mat<n_dim>(A, 2, 1)) *
+                                 vec<n_dim>(b, 1) +
+                             mat<n_dim>(A, 1, 1) * (-mat<n_dim>(A, 2, 0) * vec<n_dim>(b, 0) +
+                                                       mat<n_dim>(A, 0, 0) * vec<n_dim>(b, 2)) +
+                             mat<n_dim>(A, 1, 0) * (mat<n_dim>(A, 2, 1) * vec<n_dim>(b, 0) -
+                                                       mat<n_dim>(A, 0, 1) * vec<n_dim>(b, 2));
           for (unsigned short i = 0; i < n_dim; i++) x[i] = x[i] * det_inv;
           return true;
         }
