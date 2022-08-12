@@ -20,17 +20,21 @@ namespace FindRoot
     unsigned int iterations = 0;
   };
 
-  template <typename fun, typename T, typename... Args>
-  inline IterationData NewtonRaphson(IterationParameters& params, T* x, Args... args)
+  template <typename fun, typename T_vec, typename... Args>
+  inline IterationData NewtonRaphson(IterationParameters& params, T_vec& x, Args... args)
   {
     // Shortcut for system size
     constexpr unsigned short n_dim = fun::n_dim;
 
+    // Shortcuts for types.
+    using T = typename fun::T;
+    using T_mat = typename fun::T_mat;
+
     // Initialize variables for the Newton iteration
     IterationData return_data;
-    T r[n_dim];
-    T delta_x[n_dim];
-    T jac[n_dim * n_dim];
+    T_vec r;
+    T_vec delta_x;
+    T_mat jac;
 
     // Local Newton iteration
     unsigned int counter = 0;
@@ -40,14 +44,14 @@ namespace FindRoot
       fun::eval_f_jac(x, r, jac, args...);
 
       // Check for convergence
-      if (Math::Norm2<n_dim>(r) < params.tol_f && Math::Norm2<n_dim>(delta_x) < params.tol_x)
+      if (Math::Norm2<n_dim, T>(r) < params.tol_f && Math::Norm2<n_dim, T>(delta_x) < params.tol_x)
       {
         return_data.converged = true;
         break;
       }
 
       // Solve the linear system
-      if (Math::LinearSolve<n_dim>::SolveLinearSystem(jac, r, delta_x))
+      if (Math::LinearSolve<T, n_dim>::SolveLinearSystem(jac, r, delta_x))
       {
         // Update the state vector and advance Newton iteration counter.
         for (unsigned short i = 0; i < n_dim; i++) x[i] -= delta_x[i];
