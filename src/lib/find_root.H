@@ -54,7 +54,7 @@ namespace FindRoot
       if (Math::LinearSolve<T, n_dim>::SolveLinearSystem(jac, r, delta_x))
       {
         // Update the state vector and advance Newton iteration counter.
-        for (unsigned short i = 0; i < n_dim; i++) x[i] -= delta_x[i];
+        for (unsigned short i = 0; i < n_dim; i++) GetV(x, i) -= GetV(delta_x, i);
         counter++;
       }
       else
