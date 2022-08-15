@@ -1,21 +1,71 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
+getUnknowns[nDim_]:=Table[x[i-1],{i,nDim}]
+getInitialGuess[nDim_,val_]:=Thread[{getUnknowns[nDim],val}]
+
+
+stringReplace[string_]:=Module[{out},
+out=string;
+out=StringReplace[out,"Power(E,"->"std::exp("];
+out=StringReplace[out,"Power("->"std::pow("];
+out=StringReplace[out,"Sin("->"std::sin("];
+out=StringReplace[out,"Cos("->"std::cos("];
+out=StringReplace[out,"x("->"GetV(x,"];
+out=StringReplace[out,"f("->"GetV(f,"];
+out=StringReplace[out,"jac("->"GetM(jac,"];
+out
+]
+
+cToString[expr_]:=Module[{string},
+string=stringReplace[ToString[CForm[N@expr]]];
+string<>";"
+]
+
+functionToString[f_]:=Module[{string},
+string="";
+Do[
+string=string<>"\nf("<>ToString[i-1]<>") = "<>cToString[f[[i]]];
+,{i,Length@f}];
+
+stringReplace[string]
+]
+
+jacToString[f_]:=Module[{string},
+string="";
+Do[
+string=string<>"\njac("<>ToString[i-1]<>","<>ToString[j-1]<>") = "<>cToString[f[[i,j]]];
+,{i,Length@f},{j,Length@f}];
+
+stringReplace[string]
+]
+
+
 (* ::Text:: *)
 (*Solution for test cases*)
 
 
-f[x_]:={
-x[[1]]^2+x[[2]]+2,
-6*x[[1]]-x[[2]]*(x[[1]]+1)
-}
+f={
+Exp[x[0]-2]-x[1],
+x[1]^2-x[0]
+};
 
-FindRoot[f[{x1,x2}],{{x1,0},{x2,0}}]
+functionToString[f]
+jacToString[D[f,{getUnknowns[2]}]]
+
+FindRoot[f,getInitialGuess[2,0]]
 
 
-f[x_]:={
-x[[1]]^2+x[[2]]+2,
-6*x[[1]]-x[[2]]*(x[[1]]+1)
-}
+f={
+Exp[x[0]-2]-x[1],
+x[1]^2-x[2]*x[0],
+x[0]+Sin[x[1]]
+};
 
-FindRoot[f[{x1,x2}],{{x1,0},{x2,0}}]
+functionToString[f]
+jacToString[D[f,{getUnknowns[3]}]]
+
+FindRoot[f,getInitialGuess[3,1]]
+
+
+
