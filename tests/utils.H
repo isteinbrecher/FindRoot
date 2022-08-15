@@ -1,6 +1,6 @@
 
 
-
+#include <math.h>
 #include "../src/lib/find_root.H"
 
 constexpr double tol = 1e-12;
@@ -18,13 +18,13 @@ void f_jac_2x2(const T_vec& x, T_vec& f, T_mat& jac, const double parameter_1 = 
 {
   constexpr unsigned short n_dim = 2;
 
-  GetV(f, 0) = GetV(x, 0) * GetV(x, 0) + GetV(x, 1) + parameter_1;
-  GetV(f, 1) = 6.0 * GetV(x, 0) - GetV(x, 1) * (GetV(x, 0) + parameter_2);
+  GetV(f, 0) = std::exp(-parameter_1 + GetV(x, 0)) - GetV(x, 1);
+  GetV(f, 1) = GetV(x, 1) * GetV(x, 1) - GetV(x, 0) * parameter_2;
 
-  GetM(jac, 0, 0) = 2.0 * GetV(x, 0);
-  GetM(jac, 1, 0) = 6.0 - GetV(x, 1);
-  GetM(jac, 0, 1) = 1.0;
-  GetM(jac, 1, 1) = -1.0 - GetV(x, 0);
+  GetM(jac, 0, 0) = std::exp(-parameter_1 + GetV(x, 0));
+  GetM(jac, 0, 1) = -1.0;
+  GetM(jac, 1, 0) = -parameter_2;
+  GetM(jac, 1, 1) = 2.0 * GetV(x, 1);
 }
 
 struct Function2x2
@@ -41,8 +41,8 @@ template <typename T_vec>
 void init_2x2(T_vec& x)
 {
   constexpr unsigned short n_dim = 2;
-  GetV(x, 0) = 5.0;
-  GetV(x, 1) = 1.0;
+  GetV(x, 0) = 0.0;
+  GetV(x, 1) = 0.0;
 }
 
 template <typename T_vec>
@@ -50,9 +50,9 @@ void check_solution_2x2(const FindRoot::IterationData& data, const T_vec& x)
 {
   constexpr unsigned short n_dim = 2;
 
-  EXPECT_NEAR(GetV(x, 0), -0.25609874104976987, tol);
-  EXPECT_NEAR(GetV(x, 1), -2.0655865651672771, tol);
-  EXPECT_EQ(data.iterations, 8);
+  EXPECT_NEAR(GetV(x, 0), 0.019026016103714051, tol);
+  EXPECT_NEAR(GetV(x, 1), 0.13793482556524314, tol);
+  EXPECT_EQ(data.iterations, 5);
 }
 
 
