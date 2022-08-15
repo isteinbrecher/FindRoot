@@ -14,7 +14,7 @@ namespace FindRoot
   namespace Math
   {
     template <unsigned short n_dim, typename T, typename T_mat>
-    inline T GetLinearSystemScaleFactor(T_mat& A)
+    inline T GetLinearSystemScaleFactor(const T_mat& A)
     {
       // Scale each row so that the largest entry is one
       T inv_scale_factor = 1.0;
@@ -34,7 +34,7 @@ namespace FindRoot
     }
 
     template <unsigned short n_dim, typename T, typename T_vec>
-    inline T Norm2(T_vec& r)
+    inline T Norm2(const T_vec& r)
     {
       T norm = 0.0;
       for (unsigned short i = 0; i < n_dim; i++) norm += std::pow(GetV(r, i), 2);
@@ -52,7 +52,7 @@ namespace FindRoot
       static constexpr unsigned int n_dim = 1;
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(T_mat& A, T_vec& b, T_vec& x)
+      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
       {
         if (std::abs(GetM(A, 0, 0)) < 1e-12)
           return false;
@@ -70,13 +70,13 @@ namespace FindRoot
       static constexpr unsigned int n_dim = 2;
 
       template <typename T_mat>
-      static inline T Determinant(T_mat& A)
+      static inline T Determinant(const T_mat& A)
       {
         return GetM(A, 0, 0) * GetM(A, 1, 1) - GetM(A, 0, 1) * GetM(A, 1, 0);
       }
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(T_mat& A, T_vec& b, T_vec& x)
+      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
       {
         const T det = Determinant(A);
         const T det_scaled = det * GetLinearSystemScaleFactor<n_dim, T>(A);
@@ -98,7 +98,7 @@ namespace FindRoot
       static constexpr unsigned int n_dim = 3;
 
       template <typename T_mat>
-      static inline T Determinant(T_mat& A)
+      static inline T Determinant(const T_mat& A)
       {
         return GetM(A, 0, 2) * (-GetM(A, 1, 1) * GetM(A, 2, 0) + GetM(A, 1, 0) * GetM(A, 2, 1)) +
                GetM(A, 0, 1) * (GetM(A, 1, 2) * GetM(A, 2, 0) - GetM(A, 1, 0) * GetM(A, 2, 2)) +
@@ -106,7 +106,7 @@ namespace FindRoot
       }
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(T_mat& A, T_vec& b, T_vec& x)
+      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
       {
         const T det = Determinant(A);
         const T det_scaled = det * GetLinearSystemScaleFactor<n_dim, T>(A);
