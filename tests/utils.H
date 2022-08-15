@@ -46,12 +46,24 @@ void init_2x2(T_vec& x)
 }
 
 template <typename T_vec>
-void check_solution_2x2(const FindRoot::IterationData& data, const T_vec& x)
+void check_solution_2x2(const T_vec& x)
 {
   constexpr unsigned short n_dim = 2;
 
   EXPECT_NEAR(GetV(x, 0), 0.019026016103714051, tol);
   EXPECT_NEAR(GetV(x, 1), 0.13793482556524314, tol);
+}
+
+template <typename T_vec>
+void check_solution_2x2_no_iterations(const T_vec& x)
+{
+  check_solution_2x2(x);
+}
+
+template <typename T_vec>
+void check_solution_2x2(const FindRoot::IterationData& data, const T_vec& x)
+{
+  check_solution_2x2(x);
   EXPECT_EQ(data.iterations, 5);
 }
 
@@ -108,6 +120,12 @@ void check_solution_3x3(const T_vec& x)
   EXPECT_NEAR(GetV(x, 0), 0.90098048640721518, tol);
   EXPECT_NEAR(GetV(x, 1), 5.0495097567963922, tol);
   EXPECT_NEAR(GetV(x, 2), 1.0990195135927849, tol);
+}
+
+template <typename T_vec>
+void check_solution_3x3_no_iterations(const T_vec& x)
+{
+  check_solution_3x3(x);
 }
 
 template <typename T_vec>
