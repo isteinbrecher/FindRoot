@@ -11,44 +11,30 @@
 
 
 
-namespace FindRoot
+template <unsigned short n_dim>
+struct FindRoot::UTILS::AccessVector<n_dim, Vector>
 {
-  namespace UTILS
-  {
-    template <unsigned short n_dim>
-    struct AccessVector<n_dim, Vector>
-    {
-      inline static auto& Get(Vector& A, const unsigned short i_row) { return A.data_[i_row]; }
-    };
+  inline static auto& Get(Vector& A, const unsigned short i_row) { return A.data_[i_row]; }
+};
 
-    template <unsigned short n_dim>
-    struct AccessMatrix<n_dim, Vector>
-    {
-      inline static auto& Get(Vector& A, const unsigned short i_row, const unsigned short i_col)
-      {
-        return A.data_[i_row + n_dim * i_col];
-      }
-    };
-  }  // namespace UTILS
-}  // namespace FindRoot
-
-
-
-namespace FindRoot
+template <unsigned short n_dim>
+struct FindRoot::UTILS::AccessMatrix<n_dim, Vector>
 {
-  namespace UTILS
+  inline static auto& Get(Vector& A, const unsigned short i_row, const unsigned short i_col)
   {
-    template <unsigned short n_dim>
-    struct AccessMatrix<n_dim, std::array<double, n_dim * n_dim>>
-    {
-      inline static auto& Get(
-          std::array<double, n_dim * n_dim>& A, const unsigned short i_row, const unsigned short i_col)
-      {
-        return A[i_row + n_dim * i_col];
-      }
-    };
-  }  // namespace UTILS
-}  // namespace FindRoot
+    return A.data_[i_row + n_dim * i_col];
+  }
+};
+
+
+template <unsigned short n_dim>
+struct FindRoot::UTILS::AccessMatrix<n_dim, std::array<double, n_dim * n_dim>>
+{
+  inline static auto& Get(std::array<double, n_dim * n_dim>& A, const unsigned short i_row, const unsigned short i_col)
+  {
+    return A[i_row + n_dim * i_col];
+  }
+};
 
 
 
