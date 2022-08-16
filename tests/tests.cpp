@@ -38,6 +38,20 @@ struct FindRoot::UTILS::AccessMatrix<n_dim, std::array<double, n_dim * n_dim>>
 
 
 
+template <typename fun>
+void Test1x1()
+{
+  FindRoot::IterationParameters params;
+
+  std::array<double, 1> x;
+  init_1x1(x);
+  FindRoot::IterationData data = FindRoot::NewtonRaphson<fun>(params, x);
+  check_solution_1x1(data, x);
+}
+
+TEST(nr_tests, test_1x1) { Test1x1<Function1x1>(); }
+
+
 struct Function2x2FortranType
 {
   static constexpr unsigned short n_dim = 2;

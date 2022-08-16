@@ -13,6 +13,57 @@ class Vector
   std::vector<double> data_;
 };
 
+
+
+template <typename T_vec, typename T_mat>
+void f_jac_1x1(const T_vec& x, T_vec& f, T_mat& jac)
+{
+  constexpr unsigned short n_dim = 1;
+
+  GetV(f, 0) = std::pow(2.718281828459045, GetV(x, 0.)) + std::sin(GetV(x, 0.));
+  GetM(jac, 0, 0) = std::pow(2.718281828459045, GetV(x, 0.)) + std::cos(GetV(x, 0.));
+}
+
+struct Function1x1
+{
+  static constexpr unsigned short n_dim = 1;
+  using T = double;
+  using T_vec = std::array<double, n_dim>;
+  using T_mat = std::array<T_vec, n_dim>;
+
+  static void eval_f_jac(T_vec& x, T_vec& f, T_mat& jac) { f_jac_1x1(x, f, jac); }
+};
+
+template <typename T_vec>
+void init_1x1(T_vec& x)
+{
+  constexpr unsigned short n_dim = 1;
+  GetV(x, 0) = 0.0;
+}
+
+template <typename T_vec>
+void check_solution_1x1(const T_vec& x)
+{
+  constexpr unsigned short n_dim = 1;
+
+  EXPECT_NEAR(GetV(x, 0), -0.5885327439818611, tol);
+}
+
+template <typename T_vec>
+void check_solution_1x1_no_iterations(const T_vec& x)
+{
+  check_solution_1x1(x);
+}
+
+template <typename T_vec>
+void check_solution_1x1(const FindRoot::IterationData& data, const T_vec& x)
+{
+  check_solution_1x1(x);
+  EXPECT_EQ(data.iterations, 6);
+}
+
+
+
 template <typename T_vec, typename T_mat>
 void f_jac_2x2(const T_vec& x, T_vec& f, T_mat& jac, const double parameter_1 = 2.0, const double parameter_2 = 1.0)
 {

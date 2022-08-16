@@ -46,6 +46,16 @@ stringReplace[string]
 
 
 f={
+Sin[x[0]]+Exp[x[0]]
+};
+
+functionToString[f]
+jacToString[D[f,{getUnknowns[1]}]]
+
+FindRoot[f,getInitialGuess[1,0]]
+
+
+f={
 Exp[x[0]-2]-x[1],
 x[1]^2-x[0]
 };
@@ -66,6 +76,3 @@ functionToString[f]
 jacToString[D[f,{getUnknowns[3]}]]
 
 FindRoot[f,getInitialGuess[3,1]]
-
-
-
