@@ -39,6 +39,11 @@ void PerformanceTest(
 }
 
 
+TEST(nr_tests, test_1x1_performance)
+{
+  PerformanceTest<Function1x1>(
+      init_1x1<std::array<double, 1>>, check_solution_1x1_no_iterations<std::array<double, 1>>, 60000, 0.1);
+}
 TEST(nr_tests, test_2x2_performance)
 {
   PerformanceTest<Function2x2>(
