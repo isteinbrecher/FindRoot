@@ -20,16 +20,18 @@ namespace FindRoot
       T inv_scale_factor = 1.0;
       for (unsigned short i_row = 0; i_row < n_dim; i_row++)
       {
-        T max_value = 0.0;
+        T row_max_value = 0.0;
         for (unsigned short i_col = 0; i_col < n_dim; i_col++)
         {
-          if (std::abs(GetM(A, i_row, i_col)) > max_value)
+          const T abs_entry = std::abs(GetM(A, i_row, i_col));
+          if (abs_entry > row_max_value)
           {
-            max_value = GetM(A, i_row, i_col);
+            row_max_value = abs_entry;
           }
         }
-        inv_scale_factor *= max_value;
+        inv_scale_factor *= row_max_value;
       }
+      // Todo do something here in case the scaling factor is 0
       return 1.0 / inv_scale_factor;
     }
 
