@@ -6,6 +6,39 @@
 constexpr double tol = 1e-12;
 
 
+template <typename scalar_type, unsigned int n_row>
+class VectorT
+{
+ public:
+  VectorT() = default;
+
+  inline const scalar_type& operator()(const unsigned int i_row) const { return data_[i_row]; }
+  inline scalar_type& operator()(const unsigned int i_row) { return data_[i_row]; }
+
+ private:
+  scalar_type data_[n_row];
+};
+
+template <typename scalar_type, unsigned int n_row, unsigned int n_col>
+class MatrixT
+{
+ public:
+  MatrixT() = default;
+
+  inline const scalar_type& operator()(const unsigned int i_row, const unsigned int i_col) const
+  {
+    return data_[i_row];
+  }
+  inline scalar_type& operator()(const unsigned int i_row, const unsigned int i_col)
+  {
+    return data_[i_row * n_col + i_col];
+  }
+
+ private:
+  scalar_type data_[n_row * n_col];
+};
+
+
 class Vector
 {
  public:
