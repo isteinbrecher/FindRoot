@@ -17,7 +17,7 @@ namespace FindRoot
     inline T GetLinearSystemScaleFactor(const T_mat& A)
     {
       // Scale each row so that the largest entry is one
-      T inv_scale_factor = 1.0;
+      T scale_factor = 1.0;
       for (unsigned short i_row = 0; i_row < n_dim; i_row++)
       {
         T row_max_value = 0.0;
@@ -29,10 +29,9 @@ namespace FindRoot
             row_max_value = abs_entry;
           }
         }
-        inv_scale_factor *= row_max_value;
+        scale_factor *= row_max_value;
       }
-      // Todo do something here in case the scaling factor is 0
-      return 1.0 / inv_scale_factor;
+      return scale_factor;
     }
 
     template <unsigned short n_dim, typename T, typename T_vec>
@@ -81,7 +80,9 @@ namespace FindRoot
       static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
       {
         const T det = Determinant(A);
-        const T det_scaled = det * GetLinearSystemScaleFactor<n_dim, T>(A);
+        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
+        if (scaling_factor == 0.0) return false;
+        const T det_scaled = det / scaling_factor;
         if (std::abs(det_scaled) < 1e-12)
           return false;
         else
@@ -111,7 +112,9 @@ namespace FindRoot
       static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
       {
         const T det = Determinant(A);
-        const T det_scaled = det * GetLinearSystemScaleFactor<n_dim, T>(A);
+        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
+        if (scaling_factor == 0.0) return false;
+        const T det_scaled = det / scaling_factor;
         if (std::abs(det_scaled) < 1e-12)
           return false;
         else
