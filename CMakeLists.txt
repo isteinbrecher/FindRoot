@@ -35,7 +35,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 set(name_exe find_root-tests)
-add_executable(${name_exe} tests/tests.cpp tests/performance.cpp)
+add_executable(${name_exe} tests/tests.cpp tests/tests_math.cpp tests/performance.cpp)
 target_link_libraries(${name_exe}
   gtest_main
 )

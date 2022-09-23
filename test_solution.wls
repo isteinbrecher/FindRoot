@@ -13,6 +13,8 @@ out=StringReplace[out,"Sin("->"std::sin("];
 out=StringReplace[out,"Cos("->"std::cos("];
 out=StringReplace[out,"x("->"GetV(x,"];
 out=StringReplace[out,"f("->"GetV(f,"];
+out=StringReplace[out,"b("->"GetV(b,"];
+out=StringReplace[out,"A("->"GetM(A,"];
 out=StringReplace[out,"jac("->"GetM(jac,"];
 out
 ]
@@ -22,23 +24,25 @@ string=stringReplace[ToString[CForm[N@expr]]];
 string<>";"
 ]
 
-functionToString[f_]:=Module[{string},
+vectorToString[f_,name_]:=Module[{string},
 string="";
 Do[
-string=string<>"\nf("<>ToString[i-1]<>") = "<>cToString[f[[i]]];
+string=string<>"\n"<>name<>"("<>ToString[i-1]<>") = "<>cToString[f[[i]]];
 ,{i,Length@f}];
 
 stringReplace[string]
 ]
+functionToString[f_]:=vectorToString[f,"f"]
 
-jacToString[f_]:=Module[{string},
+matrixToString[f_,name_]:=Module[{string},
 string="";
 Do[
-string=string<>"\njac("<>ToString[i-1]<>","<>ToString[j-1]<>") = "<>cToString[f[[i,j]]];
+string=string<>"\n"<>name<>"("<>ToString[i-1]<>","<>ToString[j-1]<>") = "<>cToString[f[[i,j]]];
 ,{i,Length@f},{j,Length@f}];
 
 stringReplace[string]
 ]
+jacToString[f_]:=matrixToString[f,"jac"]
 
 
 (* ::Text:: *)
@@ -76,3 +80,22 @@ functionToString[f]
 jacToString[D[f,{getUnknowns[3]}]]
 
 FindRoot[f,getInitialGuess[3,1]]
+
+
+SeedRandom[666]
+
+getSolution[n_]:=Module[{A,b,x,string=""},
+b=RandomReal[{-1,1},{n}];
+A=RandomReal[{-1,1},{n,n}];
+
+string=string<>matrixToString[A,"A"];
+string=string<>vectorToString[b,"b"];
+string=string<>"\n"<>vectorToString[LinearSolve[A,b],"x"];
+string=string<>"\n\ndet = "<>cToString[Det[A]];
+string
+]
+
+getSolution[1]
+getSolution[2]
+getSolution[3]
+getSolution[4]
