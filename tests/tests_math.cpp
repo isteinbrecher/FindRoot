@@ -119,8 +119,8 @@ void check_solution()
   scalar_t det, det_ref;
   get_linear_solve_data<n_dim>(A, b, x_ref, det_ref);
 
-  det = FindRoot::Math::LinearSolve<scalar_t, n_dim>::Determinant(A);
-  const bool result = FindRoot::Math::LinearSolve<scalar_t, n_dim>::SolveLinearSystem(A, b, x);
+  det = FindRoot::Math::LinearSystem<n_dim, scalar_t>::Determinant(A);
+  const bool result = FindRoot::Math::LinearSolve<n_dim, scalar_t>::SolveLinearSystem(A, b, x);
 
   for (unsigned short i_dim = 0; i_dim < n_dim; i_dim++) EXPECT_NEAR(GetV(x, i_dim), GetV(x_ref, i_dim), tol);
   EXPECT_NEAR(det, det_ref, tol);

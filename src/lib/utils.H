@@ -27,9 +27,16 @@ namespace FindRoot
     };
 
     template <unsigned short n_dim, typename T_vec>
-    struct InitializeVector
+    struct FillVector
     {
-      inline static auto& Init() { return T_vec(); }
+      template <typename T>
+      inline static void Fill(T_vec& v, const T value)
+      {
+        for (unsigned short i_row = 0; i_row < n_dim; i_row++)
+        {
+          AccessVector<n_dim, T_vec>::Get(v, i_row) = value;
+        }
+      }
     };
 
     template <unsigned short n_dim, typename T_mat>

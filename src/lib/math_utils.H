@@ -13,27 +13,6 @@ namespace FindRoot
 
   namespace Math
   {
-    template <unsigned short n_dim, typename T, typename T_mat>
-    inline T GetLinearSystemScaleFactor(const T_mat& A)
-    {
-      // Scale each row so that the largest entry is one
-      T scale_factor = 1.0;
-      for (unsigned short i_row = 0; i_row < n_dim; i_row++)
-      {
-        T row_max_value = 0.0;
-        for (unsigned short i_col = 0; i_col < n_dim; i_col++)
-        {
-          const T abs_entry = std::abs(GetM(A, i_row, i_col));
-          if (abs_entry > row_max_value)
-          {
-            row_max_value = abs_entry;
-          }
-        }
-        scale_factor *= row_max_value;
-      }
-      return scale_factor;
-    }
-
     template <unsigned short n_dim, typename T, typename T_vec>
     inline T Norm2(const T_vec& r)
     {
@@ -42,41 +21,49 @@ namespace FindRoot
       return std::sqrt(norm);
     }
 
-    template <typename T>
-    inline bool GetInvertedDeterminant(const T& det, const T& scaling_factor, T& det_inv)
+    // Calculate the inverse factor for the determinant if each row is scaled such that the largest entry is 1.
+    template <unsigned short n_dim, typename T, typename T_mat>
+    inline T GetLinearSystemScaleFactor(const T_mat& A)
     {
-      if (scaling_factor == 0.0) return false;
-      const T det_scaled = det / scaling_factor;
-      if (std::abs(det_scaled) < 1e-12) return false;
-      det_inv = 1.0 / det;
-      return true;
+      T scale_factor = 1.0;
+      for (unsigned short i_row = 0; i_row < n_dim; i_row++)
+      {
+        T row_max_value = 0.0;
+        for (unsigned short i_col = 0; i_col < n_dim; i_col++)
+        {
+          row_max_value = std::max(row_max_value, std::abs(GetM(A, i_row, i_col)));
+        }
+        scale_factor *= row_max_value;
+      }
+      return scale_factor;
     }
 
-    template <typename T, unsigned short n_dim>
-    struct LinearSolve
+    template <unsigned short n_dim, typename T>
+    struct LinearSystem
     {
     };
 
+
     template <typename T>
-    struct LinearSolve<T, 1>
+    struct LinearSystem<1, T>
     {
       static constexpr unsigned int n_dim = 1;
 
-      template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
+      template <typename T_mat>
+      static inline T Determinant(const T_mat& A)
       {
-        if (std::abs(GetM(A, 0, 0)) < 1e-12)
-          return false;
-        else
-        {
-          GetV(x, 0) = GetV(b, 0) / GetM(A, 0, 0);
-          return true;
-        }
+        return GetM(A, 0, 0);
+      }
+
+      template <typename T_mat, typename T_vec>
+      static inline void SolveNotScaling(const T_mat&, const T_vec& b, T_vec& x)
+      {
+        GetV(x, 0) = GetV(b, 0);
       }
     };
 
     template <typename T>
-    struct LinearSolve<T, 2>
+    struct LinearSystem<2, T>
     {
       static constexpr unsigned int n_dim = 2;
 
@@ -87,20 +74,15 @@ namespace FindRoot
       }
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
+      static inline void SolveNotScaling(const T_mat& A, const T_vec& b, T_vec& x)
       {
-        const T det = Determinant(A);
-        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
-        T det_inv = 0.0;
-        if (!GetInvertedDeterminant(det, scaling_factor, det_inv)) return false;
-        GetV(x, 0) = (GetM(A, 1, 1) * GetV(b, 0) - GetM(A, 0, 1) * GetV(b, 1)) * det_inv;
-        GetV(x, 1) = (-GetM(A, 1, 0) * GetV(b, 0) + GetM(A, 0, 0) * GetV(b, 1)) * det_inv;
-        return true;
+        GetV(x, 0) = (GetM(A, 1, 1) * GetV(b, 0) - GetM(A, 0, 1) * GetV(b, 1));
+        GetV(x, 1) = (-GetM(A, 1, 0) * GetV(b, 0) + GetM(A, 0, 0) * GetV(b, 1));
       }
     };
 
     template <typename T>
-    struct LinearSolve<T, 3>
+    struct LinearSystem<3, T>
     {
       static constexpr unsigned int n_dim = 3;
 
@@ -113,12 +95,8 @@ namespace FindRoot
       }
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
+      static inline void SolveNotScaling(const T_mat& A, const T_vec& b, T_vec& x)
       {
-        const T det = Determinant(A);
-        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
-        T det_inv = 0.0;
-        if (!GetInvertedDeterminant(det, scaling_factor, det_inv)) return false;
         GetV(x, 0) = (GetM(A, 0, 2) * GetM(A, 2, 1) - GetM(A, 0, 1) * GetM(A, 2, 2)) * GetV(b, 1) +
                      GetM(A, 1, 2) * (-GetM(A, 2, 1) * GetV(b, 0) + GetM(A, 0, 1) * GetV(b, 2)) +
                      GetM(A, 1, 1) * (GetM(A, 2, 2) * GetV(b, 0) - GetM(A, 0, 2) * GetV(b, 2));
@@ -128,13 +106,11 @@ namespace FindRoot
         GetV(x, 2) = (GetM(A, 0, 1) * GetM(A, 2, 0) - GetM(A, 0, 0) * GetM(A, 2, 1)) * GetV(b, 1) +
                      GetM(A, 1, 1) * (-GetM(A, 2, 0) * GetV(b, 0) + GetM(A, 0, 0) * GetV(b, 2)) +
                      GetM(A, 1, 0) * (GetM(A, 2, 1) * GetV(b, 0) - GetM(A, 0, 1) * GetV(b, 2));
-        for (unsigned short i = 0; i < n_dim; i++) GetV(x, i) = GetV(x, i) * det_inv;
-        return true;
       }
     };
 
     template <typename T>
-    struct LinearSolve<T, 4>
+    struct LinearSystem<4, T>
     {
       static constexpr unsigned int n_dim = 4;
 
@@ -162,12 +138,8 @@ namespace FindRoot
       }
 
       template <typename T_mat, typename T_vec>
-      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x)
+      static inline void SolveNotScaling(const T_mat& A, const T_vec& b, T_vec& x)
       {
-        const T det = Determinant(A);
-        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
-        T det_inv = 0.0;
-        if (!GetInvertedDeterminant(det, scaling_factor, det_inv)) return false;
         GetV(x, 0) = -(GetM(A, 1, 1) * GetM(A, 2, 3) * GetM(A, 3, 2) * GetV(b, 0)) +
                      GetM(A, 1, 1) * GetM(A, 2, 2) * GetM(A, 3, 3) * GetV(b, 0) +
                      GetM(A, 0, 3) * GetM(A, 2, 2) * GetM(A, 3, 1) * GetV(b, 1) -
@@ -240,7 +212,42 @@ namespace FindRoot
                      GetM(A, 1, 1) * ((GetM(A, 0, 2) * GetM(A, 3, 0) - GetM(A, 0, 0) * GetM(A, 3, 2)) * GetV(b, 2) +
                                          GetM(A, 2, 2) * (-(GetM(A, 3, 0) * GetV(b, 0)) + GetM(A, 0, 0) * GetV(b, 3)) +
                                          GetM(A, 2, 0) * (GetM(A, 3, 2) * GetV(b, 0) - GetM(A, 0, 2) * GetV(b, 3)));
-        for (unsigned short i = 0; i < n_dim; i++) GetV(x, i) = GetV(x, i) * det_inv;
+      }
+    };
+
+    template <unsigned short n_dim, typename T>
+    struct LinearSolve
+    {
+      template <typename T_vec, typename T_mat>
+      static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x, double eps = 1e-12)
+      {
+        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
+        const T det = LinearSystem<n_dim, T>::Determinant(A);
+
+        // Check if the two values are "normal" floating point values
+        if (std::fpclassify(scaling_factor) != FP_NORMAL or std::fpclassify(det) != FP_NORMAL)
+        {
+          return false;
+        }
+
+        // Check if the scaled determinant is within a sensible range
+        const T det_scaled = det / scaling_factor;
+        if (std::abs(det_scaled) < eps)
+        {
+          return false;
+        }
+
+        // At this point the determinant is invertible
+        const T det_inv = 1.0 / det;
+
+        // Solve the linear system (without multiplying the inverse determinant)
+        LinearSystem<n_dim, T>::SolveNotScaling(A, b, x);
+
+        // Multiply with the inverse determinant
+        for (unsigned short i_row = 0; i_row < n_dim; i_row++)
+        {
+          GetV(x, i_row) *= det_inv;
+        }
         return true;
       }
     };

@@ -34,6 +34,7 @@ namespace FindRoot
     IterationData return_data;
     T_vec r;
     T_vec delta_x;
+    UTILS::FillVector<n_dim, T_vec>::Fill(delta_x, 1e100);
     T_mat jac;
 
     // Local Newton iteration
@@ -51,7 +52,7 @@ namespace FindRoot
       }
 
       // Solve the linear system
-      if (Math::LinearSolve<T, n_dim>::SolveLinearSystem(jac, r, delta_x))
+      if (Math::LinearSolve<n_dim, T>::SolveLinearSystem(jac, r, delta_x))
       {
         // Update the state vector and advance Newton iteration counter.
         for (unsigned short i = 0; i < n_dim; i++) GetV(x, i) -= GetV(delta_x, i);
