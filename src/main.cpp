@@ -1,5 +1,5 @@
 
-#include "lib/find_root.H"
+#include "find_root.H"
 #include <iostream>
 #include <array>
 #include <math.h>

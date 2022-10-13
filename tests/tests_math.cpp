@@ -3,7 +3,7 @@
  */
 
 #include <array>
-#include "../src/lib/math_utils.H"
+#include "../src/math_utils.H"
 #include <gtest/gtest.h>
 
 #include "utils.H"

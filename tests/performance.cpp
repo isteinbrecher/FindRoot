@@ -3,7 +3,7 @@
  */
 
 #include <vector>
-#include "../src/lib/find_root.H"
+#include "../src/find_root.H"
 #include <gtest/gtest.h>
 #include "utils.H"
 

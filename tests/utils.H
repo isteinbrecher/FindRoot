@@ -1,7 +1,7 @@
 
 
 #include <math.h>
-#include "../src/lib/find_root.H"
+#include "../src/find_root.H"
 
 constexpr double tol = 1e-12;
 
