@@ -11,6 +11,7 @@ namespace FindRoot
     unsigned int max_iterations = 20;
     double tol_f = 1e-12;
     double tol_x = 1e-12;
+    bool min_one_iteration = false;
   };
 
   struct IterationData
@@ -21,7 +22,7 @@ namespace FindRoot
   };
 
   template <typename fun, typename T_vec, typename... Args>
-  inline IterationData NewtonRaphson(IterationParameters& params, T_vec& x, Args... args)
+  inline IterationData NewtonRaphson(const IterationParameters& params, T_vec& x, Args... args)
   {
     // Shortcut for system size
     constexpr unsigned short n_dim = fun::n_dim;
@@ -45,6 +46,11 @@ namespace FindRoot
       fun::eval_f_jac(x, r, jac, args...);
 
       // Check for convergence
+      if (params.min_one_iteration && counter == 0)
+      {
+        // In this case we want to perform at least a single Newton step, no need to check for
+        // convergence
+      }
       if (Math::Norm2<n_dim, T>(r) < params.tol_f && Math::Norm2<n_dim, T>(delta_x) < params.tol_x)
       {
         return_data.converged = true;
