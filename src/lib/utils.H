@@ -3,6 +3,7 @@
 
 
 #include <type_traits>
+#include <limits>
 
 // Shotcuts to access vectors and matrices
 #define GetV(v, i) (FindRoot::AV<n_dim, T_vec>::Get(v, i))
@@ -68,12 +69,13 @@ namespace FindRoot
   struct GetFloatingPointType
   {
     using type = typename UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::type;
-  };
 
-  template <typename T>
-  inline static auto GetFloatingPointValue(const T& value)
-  {
-    return UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::Value(value);
+    const static auto max = std::numeric_limits<type>::max();
+
+    static inline auto Value(const T& value)
+    {
+      return UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::Value(value);
+    }
   };
 
   template <unsigned short n_dim, typename T_vec>

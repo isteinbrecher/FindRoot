@@ -35,8 +35,10 @@ namespace FindRoot
     IterationData return_data;
     T_vec r;
     T_vec delta_x;
-    UTILS::FillVector<n_dim, T_vec>::Fill(delta_x, 1e100);
     T_mat jac;
+
+    // delta_x has to be initialized, otherwise there are compiler warnings
+    for (unsigned short i = 0; i < n_dim; i++) GetV(delta_x, i) = GetFloatingPointType<T>::max;
 
     // Local Newton iteration
     unsigned int counter = 0;

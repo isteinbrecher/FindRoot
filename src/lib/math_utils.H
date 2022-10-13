@@ -18,7 +18,7 @@ namespace FindRoot
     {
       using T_out = typename GetFloatingPointType<T>::type;
       T_out norm = 0.0;
-      for (unsigned short i = 0; i < n_dim; i++) norm += std::pow(FindRoot::GetFloatingPointValue(GetV(r, i)), 2);
+      for (unsigned short i = 0; i < n_dim; i++) norm += std::pow(GetFloatingPointType<T>::Value(GetV(r, i)), 2);
       return std::sqrt(norm);
     }
 
@@ -34,7 +34,7 @@ namespace FindRoot
         T_out row_max_value = 0.0;
         for (unsigned short i_col = 0; i_col < n_dim; i_col++)
         {
-          row_max_value = std::max(row_max_value, std::abs(FindRoot::GetFloatingPointValue(GetM(A, i_row, i_col))));
+          row_max_value = std::max(row_max_value, std::abs(GetFloatingPointType<T>::Value(GetM(A, i_row, i_col))));
         }
         scale_factor *= row_max_value;
       }
@@ -228,8 +228,8 @@ namespace FindRoot
         const T det = LinearSystem<n_dim, T>::Determinant(A);
 
         // Check if the two values are "normal" floating point values
-        if (std::fpclassify(FindRoot::GetFloatingPointValue(scaling_factor)) != FP_NORMAL or
-            std::fpclassify(FindRoot::GetFloatingPointValue(det)) != FP_NORMAL)
+        if (std::fpclassify(GetFloatingPointType<T>::Value(scaling_factor)) != FP_NORMAL or
+            std::fpclassify(GetFloatingPointType<T>::Value(det)) != FP_NORMAL)
         {
           return false;
         }
