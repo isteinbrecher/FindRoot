@@ -3,7 +3,7 @@
  */
 
 #include <array>
-#include "../src/math_utils.H"
+#include "../src/details/find_root_math.H"
 #include <gtest/gtest.h>
 
 #include "utils.H"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils.H"
-#include "math_utils.H"
+#include "details/find_root_access_traits.H"
+#include "details/find_root_math.H"
 
 namespace FindRoot
 {

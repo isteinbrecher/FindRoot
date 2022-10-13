@@ -12,13 +12,13 @@
 
 
 template <unsigned short n_dim>
-struct FindRoot::UTILS::AccessVector<n_dim, Vector>
+struct FindRoot::AccessTraits::AccessVector<n_dim, Vector>
 {
   inline static auto& Get(Vector& A, const unsigned short i_row) { return A.data_[i_row]; }
 };
 
 template <unsigned short n_dim>
-struct FindRoot::UTILS::AccessMatrix<n_dim, Vector>
+struct FindRoot::AccessTraits::AccessMatrix<n_dim, Vector>
 {
   inline static auto& Get(Vector& A, const unsigned short i_row, const unsigned short i_col)
   {
@@ -28,7 +28,7 @@ struct FindRoot::UTILS::AccessMatrix<n_dim, Vector>
 
 
 template <unsigned short n_dim>
-struct FindRoot::UTILS::AccessMatrix<n_dim, std::array<double, n_dim * n_dim>>
+struct FindRoot::AccessTraits::AccessMatrix<n_dim, std::array<double, n_dim * n_dim>>
 {
   inline static auto& Get(std::array<double, n_dim * n_dim>& A, const unsigned short i_row, const unsigned short i_col)
   {

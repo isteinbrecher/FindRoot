@@ -12,7 +12,7 @@
 
 namespace FindRoot
 {
-  namespace UTILS
+  namespace AccessTraits
   {
     template <unsigned short n_dim, typename T_vec>
     struct AccessVector
@@ -29,26 +29,6 @@ namespace FindRoot
       }
     };
 
-    template <unsigned short n_dim, typename T_vec>
-    struct FillVector
-    {
-      template <typename T>
-      inline static void Fill(T_vec& v, const T value)
-      {
-        for (unsigned short i_row = 0; i_row < n_dim; i_row++)
-        {
-          AccessVector<n_dim, T_vec>::Get(v, i_row) = value;
-        }
-      }
-    };
-
-    template <unsigned short n_dim, typename T_mat>
-    struct InitializeMatrix
-    {
-      inline static auto& Init() { return T_mat(); }
-    };
-
-
     template <bool is_floating_point, typename T>
     struct FloatingPoint
     {
@@ -63,18 +43,18 @@ namespace FindRoot
       inline static const T& Value(const T& value) { return value; }
     };
 
-  }  // namespace UTILS
+  }  // namespace AccessTraits
 
   template <typename T>
   struct GetFloatingPointType
   {
-    using type = typename UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::type;
+    using type = typename FindRoot::AccessTraits::FloatingPoint<std::is_floating_point<T>::value, T>::type;
 
     const static auto max = std::numeric_limits<type>::max();
 
     static inline auto Value(const T& value)
     {
-      return UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::Value(value);
+      return FindRoot::AccessTraits::FloatingPoint<std::is_floating_point<T>::value, T>::Value(value);
     }
   };
 
@@ -83,12 +63,12 @@ namespace FindRoot
   {
     inline static const auto& Get(const T_vec& v, const unsigned short i_row)
     {
-      return FindRoot::UTILS::AccessVector<n_dim, T_vec>::Get(const_cast<T_vec&>(v), i_row);
+      return FindRoot::AccessTraits::AccessVector<n_dim, T_vec>::Get(const_cast<T_vec&>(v), i_row);
     }
 
     inline static auto& Get(T_vec& v, const unsigned short i_row)
     {
-      return FindRoot::UTILS::AccessVector<n_dim, T_vec>::Get(v, i_row);
+      return FindRoot::AccessTraits::AccessVector<n_dim, T_vec>::Get(v, i_row);
     }
   };
 
@@ -97,12 +77,12 @@ namespace FindRoot
   {
     inline static const auto& Get(const T_mat& A, const unsigned short i_row, const unsigned short i_col)
     {
-      return FindRoot::UTILS::AccessMatrix<n_dim, T_mat>::Get(const_cast<T_mat&>(A), i_row, i_col);
+      return FindRoot::AccessTraits::AccessMatrix<n_dim, T_mat>::Get(const_cast<T_mat&>(A), i_row, i_col);
     }
 
     inline static auto& Get(T_mat& A, const unsigned short i_row, const unsigned short i_col)
     {
-      return FindRoot::UTILS::AccessMatrix<n_dim, T_mat>::Get(A, i_row, i_col);
+      return FindRoot::AccessTraits::AccessMatrix<n_dim, T_mat>::Get(A, i_row, i_col);
     }
   };
 
