@@ -14,24 +14,27 @@ namespace FindRoot
   namespace Math
   {
     template <unsigned short n_dim, typename T, typename T_vec>
-    inline T Norm2(const T_vec& r)
+    inline auto Norm2(const T_vec& r)
     {
-      T norm = 0.0;
-      for (unsigned short i = 0; i < n_dim; i++) norm += std::pow(GetV(r, i), 2);
+      using T_out = typename GetFloatingPointType<T>::type;
+      T_out norm = 0.0;
+      for (unsigned short i = 0; i < n_dim; i++) norm += std::pow(FindRoot::GetFloatingPointValue(GetV(r, i)), 2);
       return std::sqrt(norm);
     }
 
-    // Calculate the inverse factor for the determinant if each row is scaled such that the largest entry is 1.
+    // Calculate the inverse factor for the determinant if each row is scaled such that the largest
+    // entry is 1.
     template <unsigned short n_dim, typename T, typename T_mat>
-    inline T GetLinearSystemScaleFactor(const T_mat& A)
+    inline auto GetLinearSystemScaleFactor(const T_mat& A)
     {
-      T scale_factor = 1.0;
+      using T_out = typename GetFloatingPointType<T>::type;
+      T_out scale_factor = 1.0;
       for (unsigned short i_row = 0; i_row < n_dim; i_row++)
       {
-        T row_max_value = 0.0;
+        T_out row_max_value = 0.0;
         for (unsigned short i_col = 0; i_col < n_dim; i_col++)
         {
-          row_max_value = std::max(row_max_value, std::abs(GetM(A, i_row, i_col)));
+          row_max_value = std::max(row_max_value, std::abs(FindRoot::GetFloatingPointValue(GetM(A, i_row, i_col))));
         }
         scale_factor *= row_max_value;
       }
@@ -221,11 +224,12 @@ namespace FindRoot
       template <typename T_vec, typename T_mat>
       static inline bool SolveLinearSystem(const T_mat& A, const T_vec& b, T_vec& x, double eps = 1e-12)
       {
-        const T scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
+        const auto scaling_factor = GetLinearSystemScaleFactor<n_dim, T>(A);
         const T det = LinearSystem<n_dim, T>::Determinant(A);
 
         // Check if the two values are "normal" floating point values
-        if (std::fpclassify(scaling_factor) != FP_NORMAL or std::fpclassify(det) != FP_NORMAL)
+        if (std::fpclassify(FindRoot::GetFloatingPointValue(scaling_factor)) != FP_NORMAL or
+            std::fpclassify(FindRoot::GetFloatingPointValue(det)) != FP_NORMAL)
         {
           return false;
         }
