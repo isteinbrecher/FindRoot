@@ -2,6 +2,8 @@
 #pragma once
 
 
+#include <type_traits>
+
 // Shotcuts to access vectors and matrices
 #define GetV(v, i) (FindRoot::AV<n_dim, T_vec>::Get(v, i))
 #define GetM(A, i, j) (FindRoot::AM<n_dim, T_mat>::Get(A, i, j))
@@ -44,7 +46,35 @@ namespace FindRoot
     {
       inline static auto& Init() { return T_mat(); }
     };
+
+
+    template <bool is_floating_point, typename T>
+    struct FloatingPoint
+    {
+    };
+
+    // For c++ float types
+    // This has to be overloaded for other scalar types, e.g., automatic differentiation types
+    template <typename T>
+    struct FloatingPoint<true, T>
+    {
+      using type = T;
+      inline static const T& Value(const T& value) { return value; }
+    };
+
   }  // namespace UTILS
+
+  template <typename T>
+  struct GetFloatingPointType
+  {
+    using type = typename UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::type;
+  };
+
+  template <typename T>
+  inline static auto GetFloatingPointValue(const T& value)
+  {
+    return UTILS::FloatingPoint<std::is_floating_point<T>::value, T>::Value(value);
+  };
 
   template <unsigned short n_dim, typename T_vec>
   struct AV
