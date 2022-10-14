@@ -50,7 +50,7 @@ namespace FindRoot
   {
     using type = typename FindRoot::AccessTraits::FloatingPoint<std::is_floating_point<T>::value, T>::type;
 
-    const static auto max = std::numeric_limits<type>::max();
+    constexpr static auto max = std::numeric_limits<type>::max();
 
     static inline auto Value(const T& value)
     {
