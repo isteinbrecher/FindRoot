@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <limits>
 
-// Shotcuts to access vectors and matrices
+// Shortcuts to access vectors and matrices
 #define GetV(v, i) (FindRoot::AV<n_dim, T_vec>::Get(v, i))
 #define GetM(A, i, j) (FindRoot::AM<n_dim, T_mat>::Get(A, i, j))
 
